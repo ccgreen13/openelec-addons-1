@@ -1,3 +1,5 @@
+#!/bin/sh
+
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
 #      Copyright (C) 2009-2012 Stephan Raue (stephan@openelec.tv)
@@ -18,19 +20,7 @@
 #  http://www.gnu.org/copyleft/gpl.html
 ################################################################################
 
-PKG_NAME="wine"
-PKG_VERSION="1.5.24"
-PKG_REV="1"
-PKG_ARCH="i386"
-PKG_LICENSE="GPL"
-PKG_SITE="http://openelec.mistake.ws/"
-PKG_URL="http://openelec.mistake.ws/$PKG_NAME-$PKG_VERSION.tar.bz2"
-PKG_DEPENDS=""
-PKG_BUILD_DEPENDS="toolchain freetype $ICONV"
-PKG_PRIORITY="optional"
-PKG_SECTION="emulator"
-PKG_SHORTDESC="Wine runs Windows executables"
-PKG_LONGDESC="Wine runs Windows executables"
-PKG_IS_ADDON="yes"
-PKG_ADDON_TYPE="xbmc.python.script"
-PKG_AUTORECONF="yes"
+. config/options $1
+
+mkdir -p $INSTALL/usr/lib
+  cp -P $PKG_BUILD/objs/.libs/libfreetype.so* $INSTALL/usr/lib

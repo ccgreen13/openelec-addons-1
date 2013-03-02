@@ -22,49 +22,54 @@
 
 . config/options $1
 
-#export MAKEFLAGS=-j1
-
-case "$(uname -m)" in
-  x86_64)
-    WIN64_HOST="--enable-win64"
-    ;;
-  *)
-    WIN64_HOST=""
-    ;;
-esac
+# unset LIBTOOL because freetype uses its own
+unset LIBTOOL
 
 cd $PKG_BUILD
-CWD=$(pwd)
 
-mkdir -p .build-host
-cd .build-host
-
-echo "setup_toolchain host"
+echo ""
+echo "*** setup host ***"
 setup_toolchain host
 
-../configure --host=$HOST_NAME \
-             --build=$HOST_NAME \
-             --prefix=$ROOT/$TOOLCHAIN \
-             --with-freetype \
-             --without-x \
-             $WIN64_HOST
-
-make __tooldeps__
-
-cd "$CWD"
-
-echo "setup_toolchain target"
-setup_toolchain target
-
-strip_lto
-strip_linker_plugin
-
-./configure --host=$TARGET_NAME \
+if [ 0 ]; then
+sh autogen.sh
+./configure --host=$HOST_NAME \
             --build=$HOST_NAME \
-            --prefix=/ \
-            --with-wine-tools="$CWD/.build-host" \
-            --with-freetype \
-            --with-alsa \
-            --with-x
+            --prefix=$ROOT/$TOOLCHAIN \
+            --disable-static \
+            --enable-shared
 
 make
+make install
+make clean
+make distclean
+fi
+
+echo ""
+echo "*** setup target ***"
+setup_toolchain target
+
+#strip_lto
+#strip_linker_plugin
+#LDFLAGS=$(echo $LDFLAGS | sed -e "s|-m32||")
+
+sh autogen.sh
+./configure --host=$TARGET_NAME \
+            --build=$HOST_NAME \
+            --prefix=/usr \
+            --sysconfdir=/etc \
+            --localstatedir=/var \
+            --disable-static \
+            --enable-shared \
+            --with-zlib
+
+make
+
+$MAKEINSTALL
+
+$SED "s:\(['= ]\)/usr:\\1$SYSROOT_PREFIX/usr:g" \
+  $SYSROOT_PREFIX/usr/bin/$1-config
+
+mv $SYSROOT_PREFIX/usr/bin/$1-config $ROOT/$TOOLCHAIN/bin
+
+ln -v -sf $SYSROOT_PREFIX/usr/include/freetype2/freetype $SYSROOT_PREFIX/usr/include

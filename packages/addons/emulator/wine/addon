@@ -22,5 +22,10 @@
 
 . config/options
 
-#mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/bin
-#  cp $PKG_BUILD/w_scan $ADDON_BUILD/$PKG_ADDON_ID/bin
+mkdir -p $ADDON_BUILD/$PKG_ADDON_ID
+
+CWD=$(pwd)
+cd "$PKG_BUILD"
+
+make DESTDIR="$CWD/$ADDON_BUILD/$PKG_ADDON_ID" install
+
