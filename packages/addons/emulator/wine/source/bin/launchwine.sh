@@ -63,7 +63,7 @@ while getopts ":kf:j:t:" opt; do
         ;;
     f)
         FILEPATH=$OPTARG
-        if [ $FILEPATH != "winecfg" ] && [ $FILEPATH != "winecfg.exe" ];
+        if [ "$FILEPATH" != "winecfg" ] && [ "$FILEPATH" != "winecfg.exe" ];
         then
             if [ ! -e "$FILEPATH" ];
             then
